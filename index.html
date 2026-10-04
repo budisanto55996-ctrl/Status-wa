@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#25d366">
+<title>Status WA & Pantun Gaul Pro</title>
+<style>
+:root{--primary:#25d366;--primary-dark:#128c7e;--bg:#f0f2f5;--card:#fff;--text:#111b21;--muted:#667781;--border:#e9edef;--badge:#e7f8ed;--danger:#e5484d}
+[data-theme=dark]{--primary:#00a884;--primary-dark:#005c4b;--bg:#111b21;--card:#202c33;--text:#e9edef;--muted:#8696a0;--border:#2a3942;--badge:#005c4b55}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:Segoe UI,Tahoma,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:12px;transition:.25s}.app{max-width:760px;margin:auto}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding:4px 2px;gap:8px}header h1{font-size:19px;color:var(--primary);margin:0}header p{font-size:11px;color:var(--muted);margin:3px 0 0}.head-actions{display:flex;gap:5px}.top-btn{background:var(--card);border:1px solid var(--border);color:var(--text);padding:7px 9px;border-radius:8px;font-size:12px;cursor:pointer}
+.search{width:100%;padding:11px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;margin-bottom:10px;outline:0}.search:focus{border-color:var(--primary)}
+.category{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:10px;scrollbar-width:none}.category::-webkit-scrollbar{display:none}.cat{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:7px 12px;border-radius:16px;font-size:12px;white-space:nowrap;cursor:pointer}.cat.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.add{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:11px}.add textarea{width:100%;height:60px;border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:7px;padding:8px;font:13px Segoe UI;resize:none;outline:0}.add-row{display:flex;gap:7px;align-items:center;margin-top:7px}.add select{flex:1;padding:7px;border-radius:7px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:12px}.submit{background:var(--primary);color:#fff;border:0;padding:8px 12px;border-radius:7px;font-size:12px;font-weight:600}
+.stats{font-size:11px;color:var(--muted);margin:0 2px 8px}.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:9px;box-shadow:0 1px 2px #0000000b}.card-text{font-size:14px;line-height:1.5;margin:0 0 10px;white-space:pre-line;word-break:break-word}.footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:8px;gap:7px}.badge{font-size:10px;background:var(--badge);color:var(--primary);padding:3px 6px;border-radius:4px;font-weight:700}.actions{display:flex;gap:5px}.action{background:transparent;border:1px solid var(--border);color:var(--text);padding:5px 8px;border-radius:6px;font-size:11px;cursor:pointer}.action.wa{background:#25d366;color:#fff;border-color:#25d366}.action.delete{color:var(--danger)}.empty{text-align:center;color:var(--muted);font-size:13px;padding:35px 10px}
+#toast{visibility:hidden;min-width:180px;max-width:90%;background:#333;color:#fff;text-align:center;border-radius:6px;padding:9px;position:fixed;z-index:99;left:50%;bottom:20px;transform:translateX(-50%);font-size:12px;opacity:0;transition:.2s}#toast.show{visibility:visible;opacity:1}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:center;justify-content:center;padding:18px}.modal.show{display:flex}.dialog{width:100%;max-width:420px;background:var(--card);color:var(--text);border-radius:13px;padding:18px}.dialog h2{font-size:17px;margin:0 0 10px}.dialog p{font-size:13px;color:var(--muted);line-height:1.5}.dialog-buttons{display:flex;gap:7px}.dialog-buttons button{flex:1;padding:9px;border:0;border-radius:7px}.cancel{background:var(--border);color:var(--text)}.confirm{background:var(--danger);color:#fff}
+footer{text-align:center;color:var(--muted);font-size:10px;padding:15px 0 5px}
+</style>
+</head>
+<body data-theme="light">
+<div class="app">
+<header><div><h1>💬 Status WA & Pantun</h1><p>Status keren, pantun & caption gaul</p></div><div class="head-actions"><button class="top-btn" onclick="randomStatus()">🎲</button><button class="top-btn" onclick="toggleTheme()" id="themeBtn">🌙</button></div></header>
+<input id="searchInput" class="search" type="search" placeholder="🔍 Cari kata-kata atau pantun..." autocomplete="off">
+<div class="category" id="categories">
+<button class="cat active" data-cat="all">Semua</button><button class="cat" data-cat="fav">❤️ Favorit</button><button class="cat" data-cat="pantun">Pantun</button><button class="cat" data-cat="bijak">Bijak</button><button class="cat" data-cat="lucu">Lucu</button><button class="cat" data-cat="pagi">Pagi</button><button class="cat" data-cat="galau">Galau</button><button class="cat" data-cat="cinta">Cinta</button><button class="cat" data-cat="motivasi">Motivasi</button><button class="cat" data-cat="islami">Islami</button>
+</div>
+<div class="add"><textarea id="customText" maxlength="1000" placeholder="Tulis status atau pantun buatanmu sendiri..."></textarea><div class="add-row"><select id="customCategory"><option value="bijak">Bijak</option><option value="pantun">Pantun</option><option value="lucu">Lucu</option><option value="pagi">Pagi</option><option value="galau">Galau</option><option value="cinta">Cinta</option><option value="motivasi">Motivasi</option><option value="islami">Islami</option></select><button class="submit" onclick="addCustomStatus()">➕ Tambah</button></div></div>
+<div id="stats" class="stats"></div><div id="content-list"></div>
+<footer>Status WA & Pantun Gaul Pro • 1.200+ status • Data tersimpan di perangkat</footer>
+</div>
+<div id="toast"></div>
+<div class="modal" id="deleteModal"><div class="dialog"><h2>Hapus status?</h2><p>Status buatan sendiri ini akan dihapus dari perangkat.</p><div class="dialog-buttons"><button class="cancel" onclick="closeDelete()">Batal</button><button class="confirm" onclick="confirmDelete()">Hapus</button></div></div></div>
+<script>
+const SEED = {
+  pantun: [
+    ["Ke pasar pagi membeli pepaya","Pulang membawa buah delima","Kalau hati sedang bahagia","Jangan lupa berbagi senyuman"],
+    ["Naik sepeda menuju taman","Singgah sebentar membeli jamu","Hari ini jangan banyak pikiran","Nikmati hidup dan jangan ragu"],
+    ["Burung pipit hinggap di dahan","Angin sejuk membawa berita","Kalau ingin hidup berkesan","Isi harimu dengan cerita"],
+    ["Pergi ke sawah membawa cangkul","Pulang sore membawa padi","Jangan terlalu sibuk mengeluh","Syukuri nikmat setiap hari"],
+    ["Minum kopi bersama teman","Kopi hangat rasanya nikmat","Kalau ingin punya masa depan","Mulailah bergerak dengan tekad"],
+    ["Malam minggu membeli martabak","Dimakan hangat bersama keluarga","Jangan mudah merasa terdesak","Semua masalah ada jalannya"],
+    ["Naik perahu ke tengah kali","Air tenang terlihat jernih","Kalau ingin hati berseri","Buang iri dan rasa sedih"],
+    ["Beli mangga di pasar lama","Mangganya manis dibawa pulang","Jaga baik orang yang setia","Jangan pergi saat mereka berjuang"],
+    ["Pagi hari menanam melati","Sore hari menyiram bunga","Jaga hati dan jaga janji","Agar hidup penuh bahagia"],
+    ["Jalan-jalan menuju kota","Singgah sebentar membeli roti","Kalau cinta sudah terasa","Jaga dengan tulus sepenuh hati"]
+  ],
+  bijak: [
+    "Hidup tidak selalu mudah, tetapi setiap kesulitan membawa pelajaran yang membuatmu lebih kuat.",
+    "Jangan ukur perjalananmu dengan perjalanan orang lain. Setiap orang punya waktunya sendiri.",
+    "Orang bijak tidak mencari hidup tanpa masalah, tetapi belajar menjadi kuat ketika masalah datang.",
+    "Diam bukan berarti kalah. Kadang diam adalah cara terbaik untuk menjaga ketenangan.",
+    "Kesalahan masa lalu tidak harus menjadi penjara. Jadikan ia guru untuk langkah berikutnya.",
+    "Kebaikan kecil yang dilakukan setiap hari bisa menjadi perubahan besar dalam hidup.",
+    "Tidak semua yang hilang adalah kerugian. Ada yang pergi agar ruang untuk hal baik terbuka.",
+    "Jangan mengejar pengakuan manusia sampai lupa menghargai dirimu sendiri.",
+    "Ketenangan sering datang ketika kita berhenti memaksa sesuatu yang memang bukan milik kita.",
+    "Lebih baik berjalan perlahan dengan arah yang benar daripada berlari tanpa tujuan."
+  ],
+  lucu: [
+    "Niat diet mulai Senin. Masalahnya, setiap Senin selalu datang bersama godaan bakso.",
+    "Dompet tipis bukan berarti gaya hidup sederhana. Kadang memang saldo sedang olahraga.",
+    "Aku bukan malas. Aku hanya sedang menghemat energi untuk hal yang belum tentu terjadi.",
+    "Kalau rebahan adalah olahraga, mungkin aku sudah atlet nasional.",
+    "Alarm sudah berbunyi lima kali. Yang bangun cuma tetangga.",
+    "Aku ingin hidup sehat, tapi gorengan selalu punya cara untuk membujuk.",
+    "Kerja keras itu penting, tapi jangan lupa istirahat agar tidak bekerja keras di rumah sakit.",
+    "Katanya uang bukan segalanya. Tapi kalau belanja, kenapa uang selalu ikut menentukan segalanya?",
+    "Aku tidak telat. Aku hanya datang setelah suasana benar-benar siap menerima kehadiranku.",
+    "Kopi belum habis, masalah sudah datang. Hidup memang tidak pernah menunggu kafein selesai."
+  ],
+  pagi: [
+    "Selamat pagi. Semoga hari ini dimulai dengan syukur dan diakhiri dengan kabar baik.",
+    "Pagi baru, kesempatan baru. Jangan bawa kecewa kemarin terlalu jauh.",
+    "Bangun, tarik napas, tersenyum. Hari ini masih punya banyak kemungkinan indah.",
+    "Semoga pagi ini rezeki dilancarkan, urusan dimudahkan, dan hati ditenangkan.",
+    "Secangkir kopi, udara pagi, dan niat baik adalah awal sederhana untuk hari yang indah.",
+    "Jangan takut memulai. Matahari saja selalu terbit tanpa menunggu semuanya sempurna.",
+    "Pagi adalah pengingat bahwa setiap hari kita diberi kesempatan untuk mencoba lagi.",
+    "Semoga langkah hari ini ringan dan setiap lelah berubah menjadi hasil yang membahagiakan.",
+    "Awali pagi dengan doa, lanjutkan dengan usaha, dan tutup hari dengan rasa syukur.",
+    "Selamat pagi untuk kamu yang tetap berjuang meski tidak semua orang tahu perjuanganmu."
+  ],
+  galau: [
+    "Kadang yang paling sulit bukan melupakan, tetapi menerima bahwa semuanya memang sudah berubah.",
+    "Aku baik-baik saja, hanya sedang belajar tidak berharap terlalu banyak.",
+    "Ada rindu yang tidak bisa disampaikan karena orangnya sudah memilih jalan yang berbeda.",
+    "Tidak semua perpisahan membutuhkan penjelasan. Beberapa hanya membutuhkan keikhlasan.",
+    "Yang membuat sedih bukan kehilangan, tetapi kenangan yang tetap datang tanpa diundang.",
+    "Aku tidak membencimu. Aku hanya sedang belajar hidup tanpa menunggu kabarmu.",
+    "Beberapa luka sembuh perlahan ketika kita berhenti mengorek cerita yang sama.",
+    "Ternyata menjadi asing dengan orang yang dulu sangat dekat adalah rasa yang sulit dijelaskan.",
+    "Jika memang bukan takdirku, semoga hatiku cukup kuat untuk melepaskannya.",
+    "Ada saatnya kita berhenti bertanya mengapa dan mulai berkata: biarlah waktu yang menjawab."
+  ],
+  cinta: [
+    "Aku tidak mencari yang sempurna, aku mencari seseorang yang mau tumbuh bersamaku.",
+    "Cinta yang sederhana terasa indah ketika dijaga dengan kejujuran dan kesetiaan.",
+    "Kalau dunia terasa berat, semoga kamu selalu punya tempat untuk pulang dan bercerita.",
+    "Aku suka caramu membuat hari biasa terasa lebih istimewa.",
+    "Cinta bukan tentang selalu setuju, tetapi tentang tetap menghargai ketika berbeda.",
+    "Yang paling romantis bukan kata-kata panjang, melainkan hadir ketika benar-benar dibutuhkan.",
+    "Semoga kita tidak hanya bertemu di waktu yang tepat, tetapi juga saling menjaga setelahnya.",
+    "Aku mungkin tidak bisa menjanjikan hidup tanpa masalah, tetapi aku bisa menjanjikan untuk berusaha.",
+    "Jangan hanya mencintai saat semuanya mudah. Tetaplah memilih ketika keadaan sulit.",
+    "Bahagia itu sederhana: dicintai dengan tulus tanpa harus berpura-pura menjadi orang lain."
+  ],
+  motivasi: [
+    "Tidak perlu menjadi hebat hari ini. Cukup menjadi sedikit lebih baik dari kemarin.",
+    "Langkah kecil tetap membawa kita maju selama kita tidak berhenti.",
+    "Gagal bukan tanda selesai. Gagal adalah tanda bahwa kita sedang belajar.",
+    "Kalau belum berhasil, ubah cara. Jangan langsung menganggap dirimu tidak mampu.",
+    "Jangan menunggu percaya diri untuk mulai. Mulailah, lalu biarkan pengalaman membangun percaya diri.",
+    "Impian besar dibangun dari kebiasaan kecil yang dilakukan dengan konsisten.",
+    "Lelah boleh, menyerah jangan terlalu cepat.",
+    "Kamu sudah melewati banyak hal yang dulu kamu kira tidak sanggup kamu lewati.",
+    "Fokus pada apa yang bisa kamu kendalikan: usaha, sikap, dan pilihanmu hari ini.",
+    "Masa depan tidak berubah karena khawatir. Masa depan berubah karena tindakan."
+  ],
+  islami: [
+    "Bismillah untuk setiap langkah. Semoga Allah mudahkan urusan dan cukupkan rezeki.",
+    "Jangan lelah berdoa. Bisa jadi jawaban sedang disiapkan dengan cara yang lebih indah.",
+    "Syukur membuat hati melihat nikmat yang sering terlupakan.",
+    "Jika hati gelisah, dekatlah kepada Allah dan perbanyak mengingat-Nya.",
+    "Rezeki tidak selalu berbentuk uang. Kesehatan, keluarga, dan ketenangan juga merupakan nikmat.",
+    "Allah tahu lelahmu, doamu, dan perjuangan yang tidak diketahui manusia.",
+    "Jangan putus asa dari rahmat Allah. Selalu ada jalan bagi hamba yang terus berharap.",
+    "Awali pekerjaan dengan niat baik, lakukan dengan sungguh-sungguh, lalu tawakkal.",
+    "Kesabaran bukan berarti diam tanpa usaha, tetapi tetap baik sambil terus berikhtiar.",
+    "Semoga setiap langkah kita mendekatkan diri kepada Allah dan menjauhkan hati dari kesombongan."
+  ]
+};
+
+const EXTRA={
+ bijak:["Waktu mengajarkan bahwa tidak semua hal harus dijawab hari ini.","Harga dirimu tidak ditentukan oleh pendapat orang yang tidak mengenal perjuanganmu.","Belajar menerima keadaan bukan berarti berhenti berusaha.","Sederhana bukan kekurangan jika hati tahu cara bersyukur.","Kadang jalan memutar justru mempertemukan kita dengan pelajaran yang penting.","Jangan habiskan energi menjelaskan dirimu kepada orang yang sengaja salah memahami.","Kedewasaan terlihat dari cara seseorang memilih tenang ketika bisa membalas.","Kita tidak bisa mengubah kemarin, tetapi masih bisa memperbaiki cara menjalani hari ini.","Jaga ucapan karena kata-kata bisa tinggal lebih lama daripada yang mengucapkannya.","Orang yang tepat tidak membuatmu kehilangan dirimu sendiri."],
+ lucu:["Saldo dan umur sama-sama berkurang tanpa izin.","Kalau bingung memilih, pilih makan dulu. Setelah kenyang biasanya masalah terlihat lebih kecil.","Aku punya rencana besar, sayangnya bantal punya rencana yang lebih kuat.","Bukan tidak punya tujuan, sedang mencari sinyal kehidupan.","Hidup itu seperti Wi-Fi, kadang dekat router pun masih tidak dapat koneksi.","Aku sudah dewasa, tapi kalau lihat diskon tetap kehilangan kendali.","Kalau rezeki tidak kunjung datang, mungkin alamatnya salah.","Kerjaan menumpuk, tapi semangat memilih mode hemat baterai.","Aku ingin menabung, tetapi uang selalu punya cita-cita sendiri.","Kebahagiaan tidak bisa dibeli, tetapi bakso bisa membantu."],
+ pagi:["Pagi yang tenang sering menjadi awal dari keputusan yang baik.","Semoga kopi hari ini pahitnya cukup, tetapi hidupnya tetap manis.","Jangan lupa sarapan dan jangan lupa punya alasan untuk tersenyum.","Pagi datang tanpa membawa janji, tetapi selalu membawa kesempatan.","Semoga hari ini ada kabar yang membuat hati berkata alhamdulillah.","Buka jendela, hirup udara, lalu mulai lagi dengan hati yang lebih ringan.","Hari baru tidak meminta kita sempurna, hanya meminta kita mencoba.","Semoga pekerjaan hari ini lancar dan perjalanan pulang penuh ketenangan.","Pagi adalah halaman kosong, tulislah sesuatu yang membuatmu bangga malam nanti.","Semoga yang dicari hari ini menemukan jalan menuju kita."],
+ galau:["Ada pesan yang tidak pernah terkirim karena takut jawaban lebih menyakitkan.","Rindu kadang hanya butuh tempat untuk diam, bukan untuk disampaikan.","Aku belajar bahwa kehilangan seseorang tidak berarti kehilangan seluruh masa depan.","Kenangan tidak mengetuk pintu, ia datang ketika hati sedang lengah.","Ada hubungan yang berakhir bukan karena tidak sayang, tetapi karena tidak lagi searah.","Melepaskan bukan kalah; kadang itu cara terakhir untuk menyelamatkan diri.","Aku merindukan versi diriku yang belum mengenal rasa kecewa ini.","Tidak semua orang yang kita cintai ditakdirkan tinggal.","Yang paling sunyi adalah ketika ingin bercerita kepada orang yang dulu selalu mendengar.","Semoga suatu hari nama yang dulu membuat sesak hanya menjadi bagian dari cerita."],
+ cinta:["Aku suka hubungan yang membuat kita bisa menjadi diri sendiri tanpa takut dihakimi.","Cinta tumbuh dari perhatian kecil yang dilakukan berulang kali.","Rumah bukan selalu tempat; kadang rumah adalah seseorang yang membuat hati tenang.","Aku ingin mengenalmu bukan hanya saat bahagia, tetapi juga saat hidup sedang berat.","Kesetiaan terlihat ketika tidak ada yang melihat.","Cinta yang sehat memberi ruang untuk tumbuh, bukan alasan untuk saling mengurung.","Terima kasih sudah hadir di hari-hari yang sebelumnya terasa biasa.","Aku tidak butuh janji sempurna, aku butuh kejujuran yang konsisten.","Semoga kita selalu punya waktu untuk saling mendengar.","Dicintai dengan sederhana kadang jauh lebih mewah daripada kata-kata indah."],
+ motivasi:["Jangan bandingkan bab satu hidupmu dengan bab dua puluh orang lain.","Satu kegagalan tidak menghapus semua kemampuan yang sudah kamu bangun.","Kerjakan yang bisa dikerjakan hari ini, sisanya biarkan mengikuti proses.","Konsisten sering mengalahkan bakat yang hanya muncul sesekali.","Jika tujuan masih penting, istirahatlah seperlunya lalu lanjutkan.","Tidak ada langkah yang sia-sia jika membuatmu lebih paham arah.","Berani memulai berarti memberi kesempatan kepada dirimu untuk berkembang.","Jangan menunggu keadaan sempurna untuk melakukan sesuatu yang berarti.","Perubahan besar sering dimulai dari keputusan kecil yang tidak terlihat orang lain.","Kamu tidak harus cepat; kamu hanya perlu terus bergerak."],
+ islami:["Semoga hati kita selalu cukup dengan apa yang Allah tetapkan.","Doa yang belum terlihat jawabannya bukan berarti tidak didengar.","Perbanyak syukur ketika lapang dan perbanyak sabar ketika sempit.","Semoga rezeki yang datang membawa berkah, bukan hanya jumlah.","Allah mengetahui jalan yang belum mampu kita lihat.","Jadikan kesulitan sebagai kesempatan untuk lebih dekat kepada Allah.","Tidak ada usaha baik yang sia-sia di hadapan Allah.","Semoga keluarga kita diberi kesehatan, keselamatan, dan ketenangan.","Ketika rencana manusia berubah, jangan lupa bahwa Allah tetap memegang kendali.","Semoga setiap rezeki membuat kita semakin rendah hati dan gemar berbagi."]
+};
+
+const PANTUN_EXTRA=[
+ ["Ke pasar membeli semangka","Pulang membawa bunga melati","Jangan lupa menjaga langkah","Agar hidup penuh berarti"],
+ ["Burung camar terbang melayang","Hinggap sebentar di pohon jati","Kalau ingin hidup tenang","Jagalah ucapan dan hati"],
+ ["Membeli buku di toko lama","Buku dibaca di sore hari","Jangan simpan dendam di dada","Maafkan agar hati berseri"],
+ ["Pergi pagi membawa bekal","Bekalnya nasi dengan teri","Kalau ingin hidup maksimal","Berani mencoba setiap hari"],
+ ["Naik motor menuju kota","Jalan ramai tetap hati-hati","Kalau ingin punya cerita","Jalani hidup sepenuh hati"]
+];
+
+const EXTRA_PANTUN_LINES=[
+ ["Ke kebun memetik pepaya","Singgah sebentar membeli jamu","Hidup akan terasa bahagia","Jika hati pandai bersyukur"],
+ ["Burung nuri di atas batu","Terbang rendah menuju kali","Kalau ingin punya sahabat baru","Mulailah tulus dari dalam hati"],
+ ["Pergi ke pasar membeli pita","Pita merah dibawa pulang","Jangan takut mencoba cerita","Karena pengalaman membuat matang"],
+ ["Naik kereta menuju kota","Membawa bekal roti keju","Kalau ingin hidup bermakna","Gunakan waktu dengan ilmu"],
+ ["Pohon mangga dekat halaman","Buahnya jatuh terkena pagi","Jagalah baik persahabatan","Agar kenangan tetap berarti"],
+ ["Mancing ikan di tepi rawa","Dapat satu dibawa pulang","Jangan mudah menyerah kecewa","Masih banyak harapan datang"],
+ ["Ke taman membawa kamera","Memotret bunga warna-warni","Jika ingin hati bahagia","Hargai orang di sekitar kita"],
+ ["Beli ketupat bersama ibu","Dimakan hangat saat lebaran","Kalau ingin hidup maju","Belajar dari setiap kegagalan"]
+];
+
+function makeLargeData(){
+  const out=[];
+  const add=(text,category)=>out.push({text,category});
+
+  // 150 pantun unik: 10 pembuka x 15 penutup.
+  const pantunA=[
+    ["Pagi hari membeli pepaya","Singgah sebentar di kedai lama"],
+    ["Naik sepeda menuju taman","Angin sejuk menyapa ceria"],
+    ["Burung pipit hinggap di dahan","Terbang rendah menuju perigi"],
+    ["Pergi ke sawah membawa bekal","Pulang sore membawa padi"],
+    ["Minum kopi bersama kawan","Duduk santai di teras rumah"],
+    ["Malam minggu membeli martabak","Dibawa pulang untuk keluarga"],
+    ["Naik perahu menyusuri kali","Air bening memantulkan cahaya"],
+    ["Beli mangga di pasar lama","Pedagang ramah menawarkan buah"],
+    ["Pagi cerah menanam melati","Sore hari menyiram bunga"],
+    ["Jalan-jalan menuju kota","Singgah sebentar membeli roti"]
+  ];
+  const pantunB=[
+    ["Jangan lupa menjaga langkah","Agar hidup penuh bahagia"],
+    ["Kalau hati sedang gembira","Bagikan senyum kepada semua"],
+    ["Kalau ingin punya masa depan","Mulailah berani melangkah"],
+    ["Syukuri nikmat setiap hari","Agar hati selalu berseri"],
+    ["Jaga baik orang yang setia","Jangan pergi saat dia berjuang"],
+    ["Rawat cinta dengan percaya","Jangan biarkan ego menang"],
+    ["Bila masalah datang menghadang","Tenangkan hati lalu berusaha"],
+    ["Kalau ingin hidup berarti","Gunakan waktu sebaik-baiknya"],
+    ["Jangan simpan iri di hati","Lebih baik tumbuhkan bahagia"],
+    ["Belajar sabar dalam menanti","Sebab semua ada waktunya"],
+    ["Jika langkah terasa berat","Istirahat sebentar lalu berjalan"],
+    ["Kalau ingin hubungan erat","Jujur dan tulus jadi pegangan"],
+    ["Bersyukur membuat hati ringan","Nikmat kecil terasa berharga"],
+    ["Jangan takut mencoba hal baru","Pengalaman membuat kita dewasa"],
+    ["Semoga hari membawa kabar baik","Dan rezeki datang bersama berkah"]
+  ];
+  pantunA.forEach(a=>pantunB.forEach(b=>add(a.concat(b).join("\n"),"pantun")));
+
+  const pools={
+    bijak:{
+      a:["Hidup tidak selalu berjalan sesuai rencana","Jangan ukur langkahmu dengan perjalanan orang lain","Kesalahan masa lalu tidak harus menjadi penjara","Ketenangan datang ketika kita menerima kenyataan","Orang bijak belajar dari hal yang tidak menyenangkan","Tidak semua kehilangan berarti sebuah kerugian","Kebaikan kecil tetap bernilai meski tidak dipuji","Waktu yang berlalu tidak bisa dibeli kembali","Kita tidak bisa mengatur semua keadaan","Kedewasaan tumbuh dari pengalaman yang jujur"],
+      b:["karena setiap proses punya pelajarannya sendiri","sebab setiap orang memiliki waktunya masing-masing","jadikan pengalaman itu guru untuk langkah berikutnya","tanpa perlu memaksa sesuatu yang belum menjadi milik kita","dengan tetap menjaga hati dan pikiran tetap tenang","karena yang penting bukan sempurna, melainkan terus bertumbuh","agar hidup tidak habis hanya untuk membandingkan diri","supaya hari ini menjadi lebih berarti daripada kemarin","dengan memilih sikap yang bisa kita kendalikan","dan biarkan waktu menunjukkan hasil dari pilihan kita"]},
+    lucu:{
+      a:["Niat diet selalu terdengar meyakinkan","Dompet tipis mengajarkan banyak hal","Alarm pagi punya bakat menjadi musuh","Kopi belum habis, masalah sudah datang","Aku bukan malas, aku sedang hemat tenaga","Rencana olahraga sudah tersusun rapi","Belanja online memang terlihat sederhana","Kalau rebahan adalah prestasi","Katanya uang bukan segalanya","Aku ingin hidup sehat mulai hari ini"],
+      b:["sampai aroma gorengan lewat dan semua teori runtuh","terutama ketika tanggal tua mulai mendekat","karena tombol snooze ternyata sangat persuasif","seolah hidup tidak mau menunggu kafein selesai","untuk menghadapi tugas yang belum tentu jadi selesai","tetapi kasur selalu punya argumen yang lebih kuat","sampai keranjang belanja terasa seperti panggilan hati","mungkin aku sudah punya sertifikat tingkat nasional","tetapi coba bayar tagihan tanpa uang, baru terasa pentingnya","asal jangan ada teman yang menawarkan makanan enak"]},
+    pagi:{
+      a:["Pagi baru membawa kesempatan baru","Matahari sudah terbit dengan tenang","Secangkir kopi bisa menjadi teman sederhana","Awali hari dengan hati yang bersyukur","Hari ini belum memiliki cerita","Udara pagi mengingatkan kita untuk bernapas","Setiap pagi adalah kesempatan untuk mencoba lagi","Langkah pertama hari ini tidak harus sempurna","Semoga pagi ini membawa ketenangan","Bangunlah dengan niat yang baik"],
+      b:["semoga langkahmu ringan dan urusanmu dimudahkan","jadikan sinarnya sebagai pengingat untuk terus bergerak","nikmati sederhana tanpa melupakan tujuan","agar pekerjaan selesai dengan hati yang lapang","tulislah dengan usaha yang lebih baik dari kemarin","ambil napas dalam-dalam lalu mulai perlahan","karena kegagalan kemarin bukan akhir perjalanan","yang penting arahmu benar dan semangatmu tetap ada","serta kabar baik datang dari arah yang tidak disangka","lalu percayakan hasilnya kepada usaha dan doa"]},
+    galau:{
+      a:["Kadang yang paling sulit bukan melupakan","Ada rindu yang tidak bisa disampaikan","Perpisahan membuat banyak hal terasa berbeda","Aku belajar menerima bahwa tidak semua orang menetap","Kenangan sering datang tanpa meminta izin","Hati membutuhkan waktu untuk memahami kehilangan","Tidak semua pertanyaan memiliki jawaban segera","Ada luka yang sembuh setelah kita berhenti mengingat","Menjadi asing dengan seseorang yang dulu dekat terasa aneh","Jika memang harus pergi, biarkan waktu membantu"],
+      b:["melainkan menerima bahwa cerita itu memang sudah selesai","karena keadaan sudah membuat jalan kita berbeda","meski hati masih ingin mengulang masa yang indah","tanpa harus menyalahkan diri sendiri","terutama ketika malam menjadi terlalu sunyi","dan proses itu tidak perlu dipaksakan selesai hari ini","kadang jawaban terbaik adalah belajar berdamai","agar hati punya ruang untuk menerima hal baru","namun hidup tetap harus berjalan ke depan","sampai rasa sakit berubah menjadi sebuah pelajaran"]},
+    cinta:{
+      a:["Cinta yang tulus tidak selalu membutuhkan kata panjang","Aku tidak mencari seseorang yang sempurna","Hubungan yang sehat dibangun dari kejujuran","Bahagia bersama sering dimulai dari hal sederhana","Cinta bukan hanya tentang hari-hari indah","Seseorang yang tepat membuat kita nyaman menjadi diri sendiri","Kesetiaan terlihat ketika keadaan tidak mudah","Perhatian kecil bisa terasa lebih berarti daripada hadiah mahal","Mencintai berarti belajar memahami perbedaan","Hubungan yang baik memberi ruang untuk tumbuh"],
+      b:["tetapi hadir ketika kehadiran benar-benar dibutuhkan","aku hanya ingin seseorang yang mau tumbuh bersamaku","karena kepercayaan tidak bisa dibangun dengan pura-pura","seperti saling mendengar tanpa merasa harus menang","sebab pilihan untuk tetap menjaga justru terlihat saat sulit","tanpa membuat kita takut menjadi diri sendiri","karena cinta diuji bukan hanya ketika semuanya menyenangkan","jika diberikan dengan tulus dan tanpa perhitungan","selama keduanya mau belajar saling menghargai","agar dua orang tetap menjadi diri sendiri sekaligus berjalan bersama"]},
+    motivasi:{
+      a:["Tidak perlu menjadi hebat dalam satu hari","Langkah kecil tetap membawa kita maju","Gagal bukan tanda bahwa semuanya selesai","Jangan menunggu percaya diri untuk mulai","Impian besar dibangun dari kebiasaan kecil","Lelah adalah bagian dari perjalanan","Jika cara pertama belum berhasil","Masa depan tidak berubah hanya karena kita khawatir","Kamu sudah melewati banyak hal yang dulu terasa mustahil","Tetap bergerak meski kemajuan terasa lambat"],
+      b:["yang penting hari ini ada kemajuan meski sedikit","selama kamu tidak berhenti mencoba","jadikan kegagalan sebagai bahan untuk memperbaiki strategi","karena keberanian tumbuh setelah kita mengambil langkah","dan hasil besar biasanya lahir dari konsistensi","beristirahatlah bila perlu, lalu lanjutkan kembali","cari cara lain tanpa buru-buru menyalahkan diri sendiri","tindakan kecil hari ini lebih berguna daripada kekhawatiran panjang","itu bukti bahwa kemampuanmu terus bertambah","sebab perjalanan panjang memang membutuhkan kesabaran"]},
+    islami:{
+      a:["Bismillah untuk setiap langkah yang dimulai","Jangan lelah berdoa meski jawaban belum terlihat","Syukur membuat nikmat kecil terasa besar","Ketika hati gelisah, dekatlah kepada Allah","Rezeki tidak selalu berbentuk harta","Allah mengetahui lelah yang tidak dilihat manusia","Jangan putus asa dari rahmat Allah","Awali pekerjaan dengan niat yang baik","Kesabaran bukan berarti berhenti berusaha","Semoga hati kita selalu dijaga"],
+      b:["semoga Allah mudahkan urusan dan cukupkan rezeki","karena waktu terbaik selalu berada dalam ketetapan-Nya","sebab banyak nikmat hadir tanpa kita sadari","dan perbanyak mengingat-Nya dalam keadaan apa pun","kesehatan, keluarga, waktu, dan ketenangan juga merupakan karunia","termasuk doa yang hanya kita sampaikan dalam diam","selama kita tetap berharap dan memperbaiki diri","lakukan dengan sungguh-sungguh lalu serahkan hasilnya kepada Allah","tetapi tetap ikhtiar sambil menjaga hati dari putus asa","agar langkah kita membawa manfaat bagi diri dan sesama"]}
+  };
+  const closers={
+    bijak:[" Pilihlah sikap yang membuat hidup terasa lebih damai."," Karena pada akhirnya, cara kita menjalani proses sama pentingnya dengan hasilnya."],
+    lucu:[" Jadi, jangan terlalu serius menghadapi hidup sampai lupa tertawa."," Intinya sederhana: tetap waras, tetap santai, dan jangan lupa cek saldo."],
+    pagi:[" Semoga semangat itu menemani langkahmu sampai malam."," Jadikan hari ini kesempatan untuk membuat satu cerita baik lagi."],
+    galau:[" Pelan-pelan saja, hati juga berhak pulih tanpa dikejar waktu."," Suatu hari nanti, cerita ini akan terasa lebih ringan untuk dikenang."],
+    cinta:[" Sebab hubungan yang indah dibangun dari pilihan untuk saling menjaga."," Dan ketika dua hati saling menghargai, hal sederhana pun terasa istimewa."],
+    motivasi:[" Tidak harus cepat, yang penting terus bergerak menuju tujuan."," Percayalah, konsistensi hari ini sedang menyiapkan hasil untuk masa depan."],
+    islami:[" Semoga setiap usaha menjadi jalan datangnya kebaikan dan keberkahan."," Teruslah berdoa, berikhtiar, dan menjaga hati dalam setiap langkah."]
+  };
+  Object.keys(pools).forEach(cat=>{
+    const a=pools[cat].a,b=pools[cat].b,c=closers[cat];
+    a.forEach(x=>b.forEach(y=>c.forEach(z=>add(x+" "+y+z,cat))));
+  });
+
+  // Hapus duplikat berdasarkan teks, bukan berdasarkan nomor/index.
+  const seen=new Set();
+  return out.filter(x=>{
+    const key=x.text.trim().replace(/\s+/g," ").toLowerCase();
+    if(seen.has(key))return false;
+    seen.add(key);return true;
+  });
+}
+const DEFAULT_DATA=makeLargeData();
+
+const LABEL={pantun:"Pantun",bijak:"Bijak",lucu:"Lucu",pagi:"Pagi",galau:"Galau",cinta:"Cinta",motivasi:"Motivasi",islami:"Islami"};
+let custom=loadJSON("my_statuses",[]);let favorites=loadJSON("my_favs",[]);let currentFilter="all";let pendingDelete=null;
+function loadJSON(k,f){try{const v=JSON.parse(localStorage.getItem(k));return Array.isArray(v)?v:f}catch(e){return f}}
+function saveJSON(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function allItems(){return DEFAULT_DATA.concat(custom)}
+function itemId(x){return x.id}
+function makeId(){return "u_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8)}
+function favoriteKey(x){return itemId(x)}
+function normalizeCustom(){let changed=false;custom=custom.map(x=>{if(!x.id){changed=true;return {...x,id:makeId()}}return x});if(changed)saveJSON("my_statuses",custom)}
+normalizeCustom();
+function isFavorite(x){return favorites.includes(favoriteKey(x))}
+function setFilter(cat){currentFilter=cat;document.querySelectorAll(".cat").forEach(b=>b.classList.toggle("active",b.dataset.cat===cat));renderList()}
+document.querySelectorAll(".cat").forEach(b=>b.addEventListener("click",()=>setFilter(b.dataset.cat)));
+document.getElementById("searchInput").addEventListener("input",renderList);
+function renderList(){
+ let q=document.getElementById("searchInput").value.trim().toLowerCase();let data=allItems();
+ if(currentFilter==="fav")data=data.filter(isFavorite);else if(currentFilter!=="all")data=data.filter(x=>x.category===currentFilter);
+ if(q)data=data.filter(x=>(x.text+" "+x.category).toLowerCase().includes(q));
+ const list=document.getElementById("content-list");list.innerHTML="";
+ document.getElementById("stats").textContent=data.length+" status ditemukan"+(q?" untuk pencarian Anda":"");
+ if(!data.length){list.innerHTML='<div class="empty">😔<br><br>Tidak ada konten ditemukan.</div>';return}
+ data.forEach(item=>{
+  const card=document.createElement("div");card.className="card";
+  const p=document.createElement("p");p.className="card-text";p.textContent=item.text;
+  const foot=document.createElement("div");foot.className="footer";
+  const badge=document.createElement("span");badge.className="badge";badge.textContent=(LABEL[item.category]||item.category).toUpperCase();
+  const actions=document.createElement("div");actions.className="actions";
+  const fav=document.createElement("button");fav.className="action";fav.textContent=isFavorite(item)?"❤️":"🤍";fav.title="Favorit";fav.onclick=()=>toggleFav(item);
+  const copy=document.createElement("button");copy.className="action";copy.textContent="📋 Salin";copy.onclick=()=>copyText(item.text);
+  const wa=document.createElement("button");wa.className="action wa";wa.textContent="📤 WA";wa.onclick=()=>shareWhatsApp(item.text);
+  actions.append(fav,copy,wa);
+  if(item.user){const del=document.createElement("button");del.className="action delete";del.textContent="🗑";del.title="Hapus";del.onclick=()=>askDelete(item.id);actions.append(del)}
+  foot.append(badge,actions);card.append(p,foot);list.appendChild(card);
+ });
+}
+async function copyText(text){try{if(navigator.clipboard&&window.isSecureContext)await navigator.clipboard.writeText(text);else fallbackCopy(text);showToast("✓ Teks disalin!")}catch(e){fallbackCopy(text);showToast("✓ Teks disalin!")}}
+function fallbackCopy(text){const t=document.createElement("textarea");t.value=text;t.style.position="fixed";t.style.opacity="0";document.body.appendChild(t);t.focus();t.select();document.execCommand("copy");t.remove()}
+function shareWhatsApp(text){window.open("https://wa.me/?text="+encodeURIComponent(text),"_blank","noopener")}
+function toggleFav(item){const id=favoriteKey(item),i=favorites.indexOf(id);if(i>=0){favorites.splice(i,1);showToast("Dihapus dari Favorit")}else{favorites.push(id);showToast("❤️ Ditambahkan ke Favorit")}saveJSON("my_favs",favorites);renderList()}
+function addCustomStatus(){const el=document.getElementById("customText"),text=el.value.trim(),cat=document.getElementById("customCategory").value;if(!text){showToast("⚠️ Tulis teks dulu!");el.focus();return}const item={id:makeId(),text,category:cat,user:true};custom.unshift(item);saveJSON("my_statuses",custom);el.value="";setFilter("all");showToast("✓ Status berhasil ditambah!")}
+function askDelete(id){pendingDelete=id;document.getElementById("deleteModal").classList.add("show")}
+function closeDelete(){pendingDelete=null;document.getElementById("deleteModal").classList.remove("show")}
+function confirmDelete(){if(!pendingDelete)return;custom=custom.filter(x=>x.id!==pendingDelete);favorites=favorites.filter(x=>x!==pendingDelete);saveJSON("my_statuses",custom);saveJSON("my_favs",favorites);closeDelete();renderList();showToast("Status dihapus")}
+function randomStatus(){const data=allItems();if(!data.length)return;const item=data[Math.floor(Math.random()*data.length)];document.getElementById("searchInput").value="";currentFilter="all";document.querySelectorAll(".cat").forEach(b=>b.classList.toggle("active",b.dataset.cat==="all"));renderList();setTimeout(()=>{const cards=document.querySelectorAll(".card");const target=[...cards].find(c=>c.querySelector(".card-text")?.textContent===item.text);if(target){target.scrollIntoView({behavior:"smooth",block:"center"});target.animate([{transform:"scale(1)"},{transform:"scale(1.02)"},{transform:"scale(1)"}],{duration:350})}},30);showToast("🎲 Status acak dipilih")}
+function toggleTheme(){const dark=document.body.getAttribute("data-theme")==="dark";document.body.setAttribute("data-theme",dark?"light":"dark");localStorage.setItem("my_theme",dark?"light":"dark");document.getElementById("themeBtn").textContent=dark?"🌙":"☀️"}
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.classList.remove("show"),1600)}
+(function init(){const theme=localStorage.getItem("my_theme");if(theme==="dark"){document.body.setAttribute("data-theme","dark");document.getElementById("themeBtn").textContent="☀️"}renderList()})();
+</script>
+</body>
+</html>
